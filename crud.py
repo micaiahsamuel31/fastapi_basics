@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from datetime import date 
 from typing import Optional
@@ -30,14 +30,14 @@ def get_task(id:int):
 @app.post("/task/{id}")
 def post_task(id:int, task:task):
     if id in tasks:
-        return {"Error: student already exists"}
+        raise HTTPException(status_code=404, detail="Task not found")
     tasks[id] = task.model_dump()
     return tasks 
 
 @app.put("/task/{id}")
 def update_taskk(id:int, task:update_task):
     if id not in tasks:
-        return {"Error: student does not exist"}
+        raise HTTPException(status_code=404, detail="Task not found")
     if task.task_name != None:
         tasks[id]["task_name"] = task.task_name
 
@@ -48,7 +48,7 @@ def update_taskk(id:int, task:update_task):
 @app.delete("/task{id}")
 def delete_student(id:int):
     if id not in tasks:
-        return {"Error: student does not exist"}
+        raise HTTPException(status_code=404, detail="Task not found")
     del tasks[id]
     return("successfully deleted")
     
